@@ -11,4 +11,6 @@ VERCEL_TEAM_ID=your_team_id
 2. Run `npm install`
 3. Run `npm run dev`
 
+This project was inspired by Mehrdad Rafiee's [Vercel Status Tracker](https://github.com/mehrdadrafiee/vercel-status-tracker) and his [GitHub profile](https://github.com/mehrdadrafiee).
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

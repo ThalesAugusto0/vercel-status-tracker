@@ -11,7 +11,8 @@ const config: Config = {
     extend: {
       colors: {
         background: 'var(--background)',
-        foreground: 'var(--foreground)'
+        foreground: 'var(--foreground)',
+        destructive: '#ef4444'
       },
       keyframes: {
         'accordion-down': {

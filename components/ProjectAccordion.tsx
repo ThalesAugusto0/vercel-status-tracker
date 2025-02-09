@@ -11,6 +11,8 @@ import { format } from "date-fns";
 import React from "react";
 
 type ProjectAccordionProps = {
+  teamId: string;
+  teamName: string;
   name: string;
   deployments: DeploymentProps[];
 };
@@ -30,7 +32,7 @@ const statusConfig = {
   },
 };
 
-export default function ProjectAccordion({ name, deployments }: ProjectAccordionProps) {
+export default function ProjectAccordion({ teamId, teamName, name, deployments }: ProjectAccordionProps) {
   const [uptime, setUptime] = React.useState<number | null>(null);
   const latestDeployment = deployments[0];
   const { bgColor, icon, label, labelColor } = statusConfig[latestDeployment.state as keyof typeof statusConfig] || {};
@@ -48,12 +50,29 @@ export default function ProjectAccordion({ name, deployments }: ProjectAccordion
     setUptime(Number(uptimePercentage.toFixed(2)));
   }, [deployments]);
 
+  const averageBuildTime = React.useMemo(() => {
+    if (deployments.length === 0) return 0
+
+    const validDeployments = deployments.filter(
+      (deployments) => typeof deployments.ready === 'number' && typeof deployments.buildingAt === "number"
+    )
+
+    if (validDeployments.length === 0) return 0
+
+    const totalBuildTime = validDeployments.reduce(
+      (acc, deployment) => acc + (deployment.ready - deployment.buildingAt), 0,
+    )
+
+    return (totalBuildTime / validDeployments.length / 1000).toFixed(1)
+  }, [deployments])
+
   return (
-    <AccordionItem value={name} className="bg-white rounded-lg w-full">
+    <AccordionItem value={`${teamId}-${name}`} className="bg-white rounded-lg w-full">
       <AccordionTrigger className="p-4">
         <div className="flex w-full justify-between items-center">
           <div className="flex flex-col items-start gap-1">
             <strong>{name}</strong>
+            <span className="text-sm text-gray-500">Team: {teamName}</span>
             <span className="text-sm text-gray-500">
               Last deployed: {format(new Date(deployments[0].ready), 'MMM d, yyyy')}
             </span>
@@ -96,7 +115,7 @@ export default function ProjectAccordion({ name, deployments }: ProjectAccordion
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-gray-500" />
             <span className="text-sm">
-              Average build time: {((deployments.reduce((acc, deployment) => acc + (deployment.ready - deployment.buildingAt), 0) / deployments.length / 1000).toFixed(1))}s
+              Average build time: {averageBuildTime}s
             </span>
           </div>
         </div>
